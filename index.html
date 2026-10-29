@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schatzipubsibär 🐻💖</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;overflow:hidden;font-family:Arial,sans-serif;text-align:center;color:#4b2e2e;background:linear-gradient(135deg,#ffe6f2,#e6f7ff);transition:background 1s}
+.page{position:absolute;inset:0;overflow-y:auto;transition:transform .35s ease;padding-bottom:35px}
+#home{transform:translateX(0)}#chat{transform:translateX(100%);background:linear-gradient(135deg,#fff0f7,#e8f7ff);padding:18px}
+body.chat-open #home{transform:translateX(-100%)}body.chat-open #chat{transform:translateX(0)}
+.container{position:relative;z-index:10;padding:30px 14px}
+h1{font-size:clamp(32px,7vw,54px);margin:5px}
+p{font-size:18px}
+#baer{font-size:100px;display:inline-block;animation:huepfen 1.8s ease-in-out infinite}
+@keyframes huepfen{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-18px) rotate(-5deg)}}
+button{border:0;border-radius:16px;padding:13px 18px;margin:7px;font-size:18px;cursor:pointer;background:#ff8fc7;color:white;box-shadow:0 4px 12px #0002}
+button:hover{transform:scale(1.04)}
+#nachricht{margin:18px auto;font-size:24px;font-weight:bold;min-height:65px;max-width:700px}
+.heart,.star,.balloon,.bubble,.confetti{position:fixed;pointer-events:none;z-index:3}
+.heart{font-size:30px;animation:heartRain 4s linear forwards}
+@keyframes heartRain{from{transform:translateY(-40px) rotate(0);opacity:1}to{transform:translateY(110vh) rotate(360deg);opacity:0}}
+.star{font-size:28px;animation:twinkle 1.6s ease-out forwards}
+@keyframes twinkle{0%{transform:scale(0);opacity:0}50%{transform:scale(1.7);opacity:1}100%{transform:scale(1);opacity:0}}
+.balloon{font-size:45px;animation:balloonUp 5s linear forwards}
+@keyframes balloonUp{from{transform:translateY(110vh)}to{transform:translateY(-130vh) translateX(40px)}}
+.bubble{font-size:35px;animation:bubbleUp 6s linear forwards}
+@keyframes bubbleUp{from{transform:translateY(110vh);opacity:.8}to{transform:translateY(-120vh);opacity:0}}
+.confetti{width:10px;height:18px;animation:confettiFall 2.5s linear forwards}
+@keyframes confettiFall{from{transform:translateY(-20px) rotate(0)}to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+#moon{display:none;position:fixed;right:9%;top:7%;font-size:70px;z-index:2}
+body.night{background:linear-gradient(#111b45,#090b20);color:white}body.night #moon{display:block}body.night #nachricht{color:white}
+#box{font-size:75px;display:none;margin:10px}
+.chat-title{font-size:30px}
+#messages{height:55vh;overflow-y:auto;background:#ffffffb8;border-radius:18px;padding:12px;text-align:left;margin:12px auto;max-width:650px}
+.msg{padding:9px 12px;margin:8px 0;border-radius:15px;max-width:85%;overflow-wrap:anywhere}
+.msg.me{background:#ffc4df;margin-left:auto;text-align:right}
+.msg.bot{background:#e3e8ff;margin-right:auto}
+#chatForm{display:flex;gap:7px;max-width:650px;margin:auto}
+#chatInput{flex:1;min-width:0;border:2px solid #ffc4df;border-radius:14px;padding:12px;font-size:16px}
+.small{font-size:14px;color:#6c5a69}
+.media-row{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;max-width:650px;margin:8px auto}
+.media-btn{display:inline-block;background:#b7a4ee;color:#34264f;border-radius:13px;padding:10px 13px;margin:3px;font-size:15px;cursor:pointer;box-shadow:0 4px 12px #0002}
+.media-btn input{display:none}
+.msg img,.msg video{display:block;max-width:100%;max-height:260px;border-radius:12px;margin-top:8px}
+.msg .filename{font-size:12px;opacity:.8;margin-top:5px;overflow-wrap:anywhere}
+#chatForm button{margin:0} #chatInput{width:100%}
+.nickname-settings{max-width:650px;margin:16px auto 8px;padding:12px;background:#fff0f7;border:1px solid #f2c7dc;border-radius:14px;text-align:left;box-sizing:border-box}
+.nickname-settings label{display:block;font-weight:bold;margin:0 0 6px}
+#nicknameInput{display:block;width:100%;box-sizing:border-box;border:2px solid #ffc4df;border-radius:12px;padding:12px;font-size:16px;margin-bottom:8px}
+.nickname-settings button,.chat-actions button{font-size:14px;padding:10px 12px}
+.presence-panel{max-width:650px;margin:10px auto;padding:12px;border:1px solid #c9e8d0;border-radius:14px;background:#f2fff5;text-align:left;box-sizing:border-box}
+.presence-panel p{margin:6px 0}
+.chat-actions{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin:10px auto}
+.msg-name{display:block;font-size:12px;font-weight:bold;opacity:.8;margin-bottom:4px}
+#clearChatButton{background:#b7a4ee;color:#34264f}
+</style>
+</head>
+<body>
+<div id="moon">🌙</div>
+<section class="page" id="home">
+ <div class="container">
+  <h1>Schatzipubsibär 🐻💖</h1>
+  <div id="baer">🐻</div>
+  <p>Drück auf den Button für eine Überraschung! ✨</p>
+  <button onclick="magie()">💖✨ Überraschung! 🐻🎉</button>
+  <button onclick="openChat()">💬 Chat öffnen</button>
+  <div id="nachricht"></div>
+  <div id="box">🎁</div>
+  <p class="small">Tipp: Wische nach links, um den Chat zu öffnen, und nach rechts, um zurückzugehen.</p>
+ </div>
+</section>
+<section class="page" id="chat">
+ <h2 class="chat-title">💬 Schatzipubsibär-Chat 🐻</h2>
+ <p>Schreib eine Nachricht und drück auf Senden.</p>
+ <div class="nickname-settings">
+  <label for="nicknameInput">Dein Spitzname</label>
+  <input id="nicknameInput" type="text" maxlength="24" value="Kuschel-Freund" placeholder="Gib deinen Spitznamen ein" autocomplete="nickname">
+  <button id="saveNicknameButton" type="button">Spitzname speichern 💗</button>
+ </div>
+ <p id="nicknameStatus" class="small" aria-live="polite">Dein Spitzname erscheint bei deinen Nachrichten. 💗</p>
+ <div class="presence-panel">
+  <strong>🟢 Dein Status</strong>
+  <p id="presenceNow">Du bist gerade auf diesem Gerät aktiv.</p>
+  <p id="presenceLast" class="small"></p>
+  <p class="small">Wann andere Personen zuletzt online waren, kann diese Datei noch nicht anzeigen: Dafür muss der Chat online verbunden werden. Die Anzeige hier gilt nur für dieses Gerät.</p>
+ </div>
+ <div id="messages" aria-live="polite">
+  <div class="msg bot">Hallo! 🐻💖 Willkommen im Schatzipubsibär-Chat!</div>
+ </div>
+ <form id="chatForm">
+  <input id="chatInput" type="text" maxlength="300" placeholder="Schreib etwas ..." autocomplete="off" aria-label="Nachricht">
+  <button id="sendButton" type="submit">Senden 💖</button>
+ </form>
+ <div class="media-row">
+  <label class="media-btn">🖼️ Foto hinzufügen <input id="photoInput" type="file" accept="image/*"></label>
+  <label class="media-btn">🎬 Video hinzufügen <input id="videoInput" type="file" accept="video/*"></label>
+ </div>
+ <p id="mediaStatus" class="small" aria-live="polite"></p>
+ <div class="chat-actions">
+  <button id="clearChatButton" type="button">🗑️ Chat auf diesem Gerät löschen</button>
+  <button onclick="closeChat()">⬅️ Zurück</button>
+ </div>
+ <p class="small">Das ist ein lokaler Demo-Chat: Nachrichten bleiben auf dieser Seite und werden nicht an andere Personen gesendet.</p>
+</section>
+<script>
+const nachrichten=[
+"Du bist etwas ganz Besonderes! 💕",
+"Schatzipubsibär, ich mag dich! 🐻💖",
+"Eine kleine Überraschung für dich! ✨",
+"Ich mag dich! 💖🐻",
+"Du bringst die Sterne zum Leuchten! 🌟",
+"Schatzipubsibär ist viel zu heiß! 🔥🐻"
+];
+let nachrichtIndex=0;
+function zufall(n){return Math.floor(Math.random()*n)}
+function typ(text){const el=document.getElementById("nachricht");el.textContent="";let i=0;const timer=setInterval(()=>{el.textContent=text.slice(0,++i);if(i>=text.length)clearInterval(timer)},35)}
+function make(cls,txt,left,top){const e=document.createElement("div");e.className=cls;e.textContent=txt;if(left!==undefined)e.style.left=left+"vw";if(top!==undefined)e.style.top=top+"vh";document.body.appendChild(e);setTimeout(()=>e.remove(),7000)}
+function herzen(n){for(let i=0;i<n;i++)setTimeout(()=>make("heart",["💖","💕","❤️","💗"][zufall(4)],Math.random()*100,-5),i*70)}
+function sterne(n){for(let i=0;i<n;i++)setTimeout(()=>make("star","⭐",Math.random()*100,Math.random()*80),i*80)}
+function ballons(){for(let i=0;i<12;i++)setTimeout(()=>make("balloon","🎈",Math.random()*100,105),i*130)}
+function bubbles(){for(let i=0;i<15;i++)setTimeout(()=>make("bubble","🫧",Math.random()*100,105),i*100)}
+function konfetti(){for(let i=0;i<60;i++){const e=document.createElement("div");e.className="confetti";e.style.left=Math.random()*100+"vw";e.style.top="-5px";e.style.background=["#ff6fae","#ffd166","#7bdff2","#9b8cff","#7ee081"][zufall(5)];document.body.appendChild(e);setTimeout(()=>e.remove(),2600)}}
+function sound(){try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const a=new A,o=a.createOscillator(),g=a.createGain();o.frequency.value=660;g.gain.value=.12;o.connect(g);g.connect(a.destination);o.start();o.frequency.exponentialRampToValueAtTime(990,a.currentTime+.25);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.55);o.stop(a.currentTime+.55)}catch(e){}}
+function magie(){
+ typ(nachrichten[nachrichtIndex]);
+ nachrichtIndex=(nachrichtIndex+1)%nachrichten.length;
+ herzen(25);sterne(20);ballons();bubbles();konfetti();
+ document.getElementById("baer").animate([{transform:"scale(1)"},{transform:"scale(1.35) translateY(-35px) rotate(-12deg)"},{transform:"scale(1.35) translateY(-35px) rotate(12deg)"},{transform:"scale(1)"}],{duration:800});
+ document.body.style.background=["linear-gradient(135deg,#ffe6f2,#e6f7ff)","linear-gradient(135deg,#fff0b3,#ffd1e8)","linear-gradient(135deg,#d9d2ff,#c9f7ff)"][nachrichtIndex%3];
+ document.getElementById("box").style.display="block";setTimeout(()=>document.getElementById("box").style.display="none",2200);sound()
+}
+function openChat(){document.body.classList.add("chat-open");setTimeout(()=>document.getElementById("chatInput").focus(),350)}
+function closeChat(){document.body.classList.remove("chat-open")}
+const CHAT_HISTORY_KEY="schatzipubsibaer_chat_history_v1";
+const CHAT_NICKNAME_KEY="schatzipubsibaer_nickname_v1";
+let chatHistory=[];
+function safeReadHistory(){
+ try { const saved=JSON.parse(localStorage.getItem(CHAT_HISTORY_KEY)||"[]"); return Array.isArray(saved)?saved:[]; }
+ catch(e){ return []; }
+}
+function saveHistory(){
+ try { localStorage.setItem(CHAT_HISTORY_KEY,JSON.stringify(chatHistory)); } catch(e){}
+}
+function currentNickname(){
+ const field=document.getElementById("nicknameInput");
+ const value=(field.value||"").trim();
+ return value || "Schatzipubsibär";
+}
+function addMsg(text,who,nickname,shouldSave=true){
+ const el=document.createElement("div");el.className="msg "+who;
+ if(who==="me"){
+  const name=document.createElement("span");name.className="msg-name";name.textContent=(nickname||currentNickname())+" 💗";el.appendChild(name);
+ }
+ const content=document.createElement("div");content.textContent=text;el.appendChild(content);
+ const box=document.getElementById("messages");box.appendChild(el);box.scrollTop=box.scrollHeight;
+ if(shouldSave && who==="me"){chatHistory.push({text:text,nickname:nickname||currentNickname()});saveHistory();}
+}
+function renderSavedMessages(){
+ const box=document.getElementById("messages");
+ box.innerHTML='<div class="msg bot">Hallo! 🐻💖 Willkommen im Schatzipubsibär-Chat!</div>';
+ chatHistory.forEach(item=>addMsg(item.text,"me",item.nickname,false));
+}
+const LAST_ACTIVE_KEY="schatzipubsibaer_last_active_local_v1";
+function updatePresence(){
+ const now=new Date();
+ const fmt=now.toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"});
+ document.getElementById("presenceNow").textContent="Du bist gerade auf diesem Gerät aktiv.";
+ document.getElementById("presenceLast").textContent="Zuletzt aktiv (dieses Gerät): "+fmt;
+ try{localStorage.setItem(LAST_ACTIVE_KEY,String(Date.now()));}catch(e){}
+}
+function saveNickname(){
+ const field=document.getElementById("nicknameInput");
+ let nick=(field.value||"").trim();
+ if(!nick){document.getElementById("nicknameStatus").textContent="Bitte gib zuerst einen Spitznamen ein. 💗";field.focus();return;}
+ nick=nick.slice(0,24);field.value=nick;
+ try{localStorage.setItem(CHAT_NICKNAME_KEY,nick);}catch(e){}
+ updatePresence();
+ document.getElementById("nicknameStatus").textContent="Dein Spitzname ist jetzt „"+nick+"“! 💖";
+}
+function sendChatMessage(){
+ const input=document.getElementById("chatInput");
+ const text=input.value.trim();
+ const status=document.getElementById("mediaStatus");
+ if(!text){status.textContent="Schreib zuerst eine Nachricht. 💗";input.focus();return;}
+ const nickname=currentNickname();
+ addMsg(text,"me",nickname,true);input.value="";status.textContent="Nachricht hinzugefügt! 💖";updatePresence();input.focus();
+}
+document.getElementById("chatForm").addEventListener("submit",e=>{e.preventDefault();sendChatMessage();});
+document.getElementById("sendButton").addEventListener("click",e=>{e.preventDefault();sendChatMessage();});
+document.getElementById("saveNicknameButton").addEventListener("click",saveNickname);
+document.getElementById("nicknameInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();saveNickname();}});
+document.getElementById("clearChatButton").addEventListener("click",()=>{
+ const ok=window.confirm("Möchtest du die gespeicherten Chat-Nachrichten auf diesem Gerät wirklich löschen?");
+ if(!ok)return;
+ chatHistory=[];try{localStorage.removeItem(CHAT_HISTORY_KEY);}catch(e){}
+ renderSavedMessages();
+ document.getElementById("mediaStatus").textContent="Der Chat auf diesem Gerät wurde gelöscht. 💗";
+});
+function addMedia(file,kind){
+ const status=document.getElementById("mediaStatus");
+ if(!file)return;
+ if(kind==="photo"&&!file.type.startsWith("image/")){status.textContent="Bitte wähle eine Bilddatei aus.";return;}
+ if(kind==="video"&&!file.type.startsWith("video/")){status.textContent="Bitte wähle eine Videodatei aus.";return;}
+ const limit=kind==="photo"?12:35;
+ if(file.size>limit*1024*1024){status.textContent="Die Datei ist zu groß. Bitte wähle eine Datei unter "+limit+" MB.";return;}
+ const box=document.getElementById("messages");
+ const el=document.createElement("div");el.className="msg me";
+ const title=document.createElement("strong");title.textContent=kind==="photo"?"🖼️ Foto":"🎬 Video";el.appendChild(title);
+ const media=document.createElement(kind==="photo"?"img":"video");media.src=URL.createObjectURL(file);
+ if(kind==="photo"){media.alt="Ausgewähltes Foto";}else{media.controls=true;media.preload="metadata";}
+ el.appendChild(media);
+ const filename=document.createElement("div");filename.className="filename";filename.textContent=file.name;el.appendChild(filename);
+ box.appendChild(el);box.scrollTop=box.scrollHeight;status.textContent=(kind==="photo"?"Foto":"Video")+" im Chat angezeigt! 💗";
+}
+document.getElementById("photoInput").addEventListener("change",e=>{addMedia(e.target.files[0],"photo");e.target.value="";});
+document.getElementById("videoInput").addEventListener("change",e=>{addMedia(e.target.files[0],"video");e.target.value="";});
+try{
+ const savedNick=localStorage.getItem(CHAT_NICKNAME_KEY);
+ if(savedNick)document.getElementById("nicknameInput").value=savedNick;
+}catch(e){}
+chatHistory=safeReadHistory();
+renderSavedMessages();
+updatePresence();
+document.addEventListener("click",updatePresence);
+document.addEventListener("keydown",updatePresence);
+let startX=0,startY=0;
+document.addEventListener("touchstart",e=>{startX=e.changedTouches[0].screenX;startY=e.changedTouches[0].screenY},{passive:true});
+document.addEventListener("touchend",e=>{const dx=e.changedTouches[0].screenX-startX;const dy=e.changedTouches[0].screenY-startY;if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)){if(dx<0)openChat();else closeChat()}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key.toLowerCase()==="n"&&!e.target.matches("input"))document.body.classList.toggle("night")});
+</script>
+</body>
+</html>
