@@ -99,10 +99,10 @@ body.night{background:linear-gradient(#111b45,#090b20);color:white}body.night #m
  </div>
  <p id="mediaStatus" class="small" aria-live="polite"></p>
  <div class="chat-actions">
-  <button id="clearChatButton" type="button">🗑️ Chat auf diesem Gerät löschen</button>
+  <button id="clearChatButton" type="button">🗑️ Ansicht neu laden</button>
   <button onclick="closeChat()">⬅️ Zurück</button>
  </div>
- <p class="small">Das ist ein lokaler Demo-Chat: Nachrichten bleiben auf dieser Seite und werden nicht an andere Personen gesendet.</p>
+ <p class="small">Online-Chat: Textnachrichten werden mit Supabase geteilt. Fotos und Videos sind weiterhin nur auf diesem Gerät sichtbar.</p>
 </section>
 <script>
 const nachrichten=[
@@ -157,10 +157,37 @@ function addMsg(text,who,nickname,shouldSave=true){
  const box=document.getElementById("messages");box.appendChild(el);box.scrollTop=box.scrollHeight;
  if(shouldSave && who==="me"){chatHistory.push({text:text,nickname:nickname||currentNickname()});saveHistory();}
 }
-function renderSavedMessages(){
+const SUPABASE_URL="https://xkkysjqjukvgkafzqqve.supabase.co";
+const SUPABASE_KEY="sb_publishable_oiu83sRLFllvZAUnh4CYsg_fMwWR77E";
+let onlineMessages=[];
+function renderOnlineMessages(){
  const box=document.getElementById("messages");
- box.innerHTML='<div class="msg bot">Hallo! 🐻💖 Willkommen im Schatzipubsibär-Chat!</div>';
- chatHistory.forEach(item=>addMsg(item.text,"me",item.nickname,false));
+ box.innerHTML="";
+ if(!onlineMessages.length){
+  const empty=document.createElement("div");empty.className="msg bot";empty.textContent="Noch keine Nachrichten. Schreib die erste! 🐻💖";box.appendChild(empty);
+ }
+ onlineMessages.forEach(item=>{
+  const el=document.createElement("div");el.className="msg "+(item.nickname===currentNickname()?"me":"bot");
+  const name=document.createElement("span");name.className="msg-name";name.textContent=(item.nickname||"Unbekannt")+" 💗";el.appendChild(name);
+  const content=document.createElement("div");content.textContent=item.content||"";el.appendChild(content);
+  const time=document.createElement("div");time.className="small";time.textContent=item.created_at?new Date(item.created_at).toLocaleString("de-DE"):"";el.appendChild(time);
+  box.appendChild(el);
+ });
+ box.scrollTop=box.scrollHeight;
+}
+async function loadOnlineMessages(showError=true){
+ const status=document.getElementById("mediaStatus");
+ try{
+  const response=await fetch(SUPABASE_URL+"/rest/v1/chat_messages?select=id,nickname,content,created_at&order=created_at.asc&limit=100",{
+   headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY}
+  });
+  if(!response.ok)throw new Error("HTTP "+response.status+" – "+(await response.text()).slice(0,250));
+  onlineMessages=await response.json();
+  renderOnlineMessages();
+  if(showError===false||status.textContent.startsWith("Online-Chat fehlgeschlagen:"))status.textContent="Online verbunden 💗";
+ }catch(error){
+  if(showError)status.textContent="Online-Chat fehlgeschlagen: "+error.message;
+ }
 }
 const LAST_ACTIVE_KEY="schatzipubsibaer_last_active_local_v1";
 function updatePresence(){
@@ -179,24 +206,32 @@ function saveNickname(){
  updatePresence();
  document.getElementById("nicknameStatus").textContent="Dein Spitzname ist jetzt „"+nick+"“! 💖";
 }
-function sendChatMessage(){
+async function sendChatMessage(){
  const input=document.getElementById("chatInput");
  const text=input.value.trim();
  const status=document.getElementById("mediaStatus");
+ const button=document.getElementById("sendButton");
  if(!text){status.textContent="Schreib zuerst eine Nachricht. 💗";input.focus();return;}
- const nickname=currentNickname();
- addMsg(text,"me",nickname,true);input.value="";status.textContent="Nachricht hinzugefügt! 💖";updatePresence();input.focus();
+ const nickname=currentNickname().slice(0,30);
+ button.disabled=true;status.textContent="Nachricht wird gesendet …";
+ try{
+  const response=await fetch(SUPABASE_URL+"/rest/v1/chat_messages",{
+   method:"POST",
+   headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Prefer":"return=minimal"},
+   body:JSON.stringify({nickname:nickname,content:text.slice(0,2000)})
+  });
+  if(!response.ok)throw new Error("HTTP "+response.status+" – "+(await response.text()).slice(0,250));
+  input.value="";status.textContent="Nachricht gesendet! 💖";await loadOnlineMessages();input.focus();updatePresence();
+ }catch(error){status.textContent="Senden fehlgeschlagen: "+error.message;}
+ finally{button.disabled=false;}
 }
 document.getElementById("chatForm").addEventListener("submit",e=>{e.preventDefault();sendChatMessage();});
 document.getElementById("sendButton").addEventListener("click",e=>{e.preventDefault();sendChatMessage();});
 document.getElementById("saveNicknameButton").addEventListener("click",saveNickname);
 document.getElementById("nicknameInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();saveNickname();}});
 document.getElementById("clearChatButton").addEventListener("click",()=>{
- const ok=window.confirm("Möchtest du die gespeicherten Chat-Nachrichten auf diesem Gerät wirklich löschen?");
- if(!ok)return;
- chatHistory=[];try{localStorage.removeItem(CHAT_HISTORY_KEY);}catch(e){}
- renderSavedMessages();
- document.getElementById("mediaStatus").textContent="Der Chat auf diesem Gerät wurde gelöscht. 💗";
+ loadOnlineMessages();
+ document.getElementById("mediaStatus").textContent="Chat aktualisiert. 💗";
 });
 function addMedia(file,kind){
  const status=document.getElementById("mediaStatus");
@@ -220,8 +255,9 @@ try{
  const savedNick=localStorage.getItem(CHAT_NICKNAME_KEY);
  if(savedNick)document.getElementById("nicknameInput").value=savedNick;
 }catch(e){}
-chatHistory=safeReadHistory();
-renderSavedMessages();
+chatHistory=[];
+loadOnlineMessages();
+setInterval(()=>loadOnlineMessages(false),5000);
 updatePresence();
 document.addEventListener("click",updatePresence);
 document.addEventListener("keydown",updatePresence);
