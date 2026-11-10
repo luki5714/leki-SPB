@@ -157,7 +157,7 @@ function addMsg(text,who,nickname,shouldSave=true){
  const box=document.getElementById("messages");box.appendChild(el);box.scrollTop=box.scrollHeight;
  if(shouldSave && who==="me"){chatHistory.push({text:text,nickname:nickname||currentNickname()});saveHistory();}
 }
-const SUPABASE_URL="https://xkkysjqjukvgkafzqqve.supabase.co";
+const SUPABASE_URL="https://xkkysjqiukvgkafzqqve.supabase.co";
 const SUPABASE_KEY="sb_publishable_oiu83sRLFllvZAUnh4CYsg_fMwWR77E";
 let onlineMessages=[];
 function renderOnlineMessages(){
